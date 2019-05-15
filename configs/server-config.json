@@ -1,0 +1,6 @@
+{
+	"ServeHttps":false,
+    "Path":"www/",
+    "CertPath":"",
+    "KeyPath":""
+}
