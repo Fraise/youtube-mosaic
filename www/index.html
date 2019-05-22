@@ -4,6 +4,125 @@
         <title>Hello world!</title>
     </head>
     <body>
-        <p>Hello world!</p>
-    </body>
+
+            <!-- <ul>
+                <li>Milk</li>
+                <li>Bread</li>
+                <li class="fade">Chips</li>
+                <li class="fade">Socks</li>
+            </ul> -->
+
+            
+            <!-- Si on a la iframe de base le code jQuery hover fonctionne, mais si on a une div plus tard remplacee par iframe dans YoutubeAPIReady, ca marche pas -->
+            <iframe id="gv5wahOSgj4" width="1261" height="480" src="https://www.youtube.com/embed/gv5wahOSgj4?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <!-- <div id="gv5wahOSgj4"></div> -->
+
+
+
+
+
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script>
+            
+            // 2. This code loads the IFrame Player API code asynchronously.
+            var tag = document.createElement('script');   
+
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            
+            // 4. The API will call this function when the video player is ready.
+            function onPlayerReady(event) {
+                event.target.setVolume(0);
+                event.target.playVideo();
+            }
+
+            $( document ).ready(function() {
+                console.log("document is ready !");
+                //marche pas pour les iframe cree dans onYouTubeIframeAPIReady, pourquoi ?
+                jQuery( "iframe" ).hover(
+                    function(){
+                        id = jQuery(this).attr('id')
+                        console.log("entered iframe : "+id);
+                        
+                        //exemple qui marche avec UNE video si on a une var sur le player
+                        videos[id].unMute();
+                        videos[id].setVolume(100); 
+                        
+                        //videos[jQuery(this).attr('id')].setVolume(100);
+                    }, function(){
+                        id = jQuery(this).attr('id')
+                        console.log("exited iframe : "+id);
+                        videos[id].setVolume(0);
+                        //videos[jQuery(this).attr('id')].setVolume(0);
+                    }
+                );
+            });
+            
+ 
+            // jQuery( "li" ).hover(
+            //     function() {
+            //         jQuery( this ).append( jQuery( "<span> ***</span>" ) );
+            //     }, function() {
+            //         jQuery( this ).find( "span:last" ).remove();
+            //     }
+            // );
+            
+            // jQuery( "li.fade" ).hover(function() {
+            //     jQuery( this ).fadeOut( 100 );
+            //     jQuery( this ).fadeIn( 500 );
+            // });
+
+            jQuery.noConflict();
+
+            
+            var videos = {};
+            
+            var player;
+            function onYouTubeIframeAPIReady() {
+
+
+                videos['gv5wahOSgj4'] = new YT.Player('gv5wahOSgj4', {
+                            // height: '390',
+                            // width: '640',
+                            // videoId: 'gv5wahOSgj4',
+                            events: {
+                            'onReady': onPlayerReady
+                            }
+                        });     
+
+                jQuery.getJSON('http://192.168.99.100/search?query=memes', function(data) {
+                
+                    for (index = 0; index < data.length; ++index) {
+                        fullUrl = data[index];
+                        code = fullUrl.slice(32);
+                        
+                        idVid = code;
+                        document.write("<div id="+idVid+"></div>");   
+                        //document.write("<iframe id="+idVid+" width='640' height='390' src='https://www.youtube.com/embed/bebuiaSKtU4?enablejsapi=1&controls=0' frameborder='0'></iframe>");
+                        videos[idVid] = new YT.Player(idVid, {
+                            height: '390',
+                            width: '640',
+                            videoId: idVid,
+                            playerVars : { 'controls ' : 0},
+                            events: {
+                            'onReady': onPlayerReady
+                            }
+                        });                       
+                    }
+                });  
+            }
+            
+
+            
+            
+        
+        </script>
+
+        </body>
 </html> 
+
+
