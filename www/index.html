@@ -1,26 +1,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hello world!</title>
+        <title>Youtube Mosaic - Experimental</title>
     </head>
     <body>
-
-            <!-- <ul>
-                <li>Milk</li>
-                <li>Bread</li>
-                <li class="fade">Chips</li>
-                <li class="fade">Socks</li>
-            </ul> -->
-
-            
-            <!-- Si on a la iframe de base le code jQuery hover fonctionne, mais si on a une div plus tard remplacee par iframe dans YoutubeAPIReady, ca marche pas -->
-            <iframe id="gv5wahOSgj4" width="1261" height="480" src="https://www.youtube.com/embed/gv5wahOSgj4?enablejsapi=1" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            <!-- <div id="gv5wahOSgj4"></div> -->
-
-
-
-
-
 
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
@@ -40,80 +23,63 @@
                 event.target.playVideo();
             }
 
-            $( document ).ready(function() {
-                console.log("document is ready !");
-                //marche pas pour les iframe cree dans onYouTubeIframeAPIReady, pourquoi ?
-                jQuery( "iframe" ).hover(
-                    function(){
-                        id = jQuery(this).attr('id')
-                        console.log("entered iframe : "+id);
-                        
-                        //exemple qui marche avec UNE video si on a une var sur le player
-                        videos[id].unMute();
-                        videos[id].setVolume(100); 
-                        
-                        //videos[jQuery(this).attr('id')].setVolume(100);
-                    }, function(){
-                        id = jQuery(this).attr('id')
-                        console.log("exited iframe : "+id);
-                        videos[id].setVolume(0);
-                        //videos[jQuery(this).attr('id')].setVolume(0);
-                    }
-                );
-            });
-            
- 
-            // jQuery( "li" ).hover(
-            //     function() {
-            //         jQuery( this ).append( jQuery( "<span> ***</span>" ) );
-            //     }, function() {
-            //         jQuery( this ).find( "span:last" ).remove();
-            //     }
-            // );
-            
-            // jQuery( "li.fade" ).hover(function() {
-            //     jQuery( this ).fadeOut( 100 );
-            //     jQuery( this ).fadeIn( 500 );
-            // });
 
             jQuery.noConflict();
 
             
             var videos = {};
             
-            var player;
             function onYouTubeIframeAPIReady() {
-
-
-                videos['gv5wahOSgj4'] = new YT.Player('gv5wahOSgj4', {
-                            // height: '390',
-                            // width: '640',
-                            // videoId: 'gv5wahOSgj4',
+                var uniqIdVid = 'gv5wahOSgj4';
+                jQuery('body').append("<div id='"+uniqIdVid+"' class='ytframe'></div>");
+                videos[uniqIdVid] = new YT.Player(uniqIdVid, {
+                            height: '240',
+                            width: '320',
+                            videoId: uniqIdVid,
                             events: {
                             'onReady': onPlayerReady
                             }
-                        });     
+                        });   
 
-                jQuery.getJSON('http://192.168.99.100/search?query=memes', function(data) {
+                jQuery.getJSON('http://192.168.99.100/search?query=funny_cat', function(data) { //objective : search bar or playlist selection to replace hardcoded stuff
                 
                     for (index = 0; index < data.length; ++index) {
                         fullUrl = data[index];
-                        code = fullUrl.slice(32);
+                        idVid = fullUrl.slice(32);
                         
-                        idVid = code;
-                        document.write("<div id="+idVid+"></div>");   
-                        //document.write("<iframe id="+idVid+" width='640' height='390' src='https://www.youtube.com/embed/bebuiaSKtU4?enablejsapi=1&controls=0' frameborder='0'></iframe>");
+                        jQuery('body').append("<div id='"+idVid+"' class='ytframe'></div>");
+                        
                         videos[idVid] = new YT.Player(idVid, {
-                            height: '390',
-                            width: '640',
+                            height: '195',
+                            width: '320',
                             videoId: idVid,
                             playerVars : { 'controls ' : 0},
                             events: {
                             'onReady': onPlayerReady
                             }
                         });                       
-                    }
+                    }  
+
+                    
+                }).always(function() {
+                    jQuery('.ytframe').hover(
+                        function(){
+                            for (var key in videos) {
+                                videos[key].setVolume(0);
+                            }
+                            id = jQuery(this).attr('id')
+                            videos[id].unMute();
+                            videos[id].setVolume(100); 
+                            
+                        }, function(){
+                            // id = jQuery(this).attr('id')
+                            // videos[id].setVolume(0);
+                        }
+                    );
                 });  
+
+
+                
             }
             
 
